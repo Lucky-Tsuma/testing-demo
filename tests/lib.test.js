@@ -1,4 +1,6 @@
 const lib = require('../lib')
+const db = require('../db')
+const mail = require('../mail')
 
 describe('absolute', () => {
     it('Return positive number for positive input', () => {
@@ -52,6 +54,38 @@ describe('registerUser', () => {
         const result = lib.registerUser('Lucky')
         expect(result).toMatchObject({ username: 'Lucky' })
         expect(result.id).toBeGreaterThan(0)
+    })
+})
+
+describe('applyDiscount', () => {
+    it('Should apply  10% discount if customer has more than 10 points', () => {
+
+        // We created a mock function here. The real one as called in the lib file calls a database(simulation), hence the need to create a mock function so we can stick to unit testing. No external dependencies involved
+        db.getCustomerSync = function (customerId) {
+            console.log('Reading fake customer(applyDiscount')
+            return { id: customerId, points: 20 }
+        }
+
+        const order = { customerId: 1, totalPrice: 10 }
+        lib.applyDiscount(order)
+        expect(order.totalPrice).toBe(9)
+    })
+})
+
+// Interaction testng here. Also, a better appraoch using jest mock functions.
+describe('notifyCustomer', () => {
+    it('Should send an email to the customer', () => {
+
+        db.getCustomerSync = jest.fn().mockReturnValue({ email: 'a' })
+        mail.send = jest.fn()
+
+        // lib.notifyCustomer calls getCustomerSync() and mail.send() in that order that why we had to create mock fxns for them to begin with
+        lib.notifyCustomer({ customerId: 1 })
+
+        expect(mail.send).toHaveBeenCalled()
+        // checking that the mock fxn was called with certain arguments
+        expect(mail.send.mock.calls[0][0]).toBe('a')
+        expect(mail.send.mock.calls[0][1]).toMatch(/order/)
     })
 })
 

@@ -5,7 +5,7 @@ module.exports.getCustomerSync = function(id) {
 }
 
 module.exports.getCustomer = async function(id) { 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     console.log('Reading a customer from MongoDB...');
     resolve({ id: id, points: 11 });
   });
