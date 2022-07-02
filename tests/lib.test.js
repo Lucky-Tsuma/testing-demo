@@ -60,7 +60,6 @@ describe('registerUser', () => {
 describe('applyDiscount', () => {
     it('Should apply  10% discount if customer has more than 10 points', () => {
 
-        // We created a mock function here. The real one as called in the lib file calls a database(simulation), hence the need to create a mock function so we can stick to unit testing. No external dependencies involved
         db.getCustomerSync = function (customerId) {
             console.log('Reading fake customer(applyDiscount')
             return { id: customerId, points: 20 }
@@ -79,11 +78,9 @@ describe('notifyCustomer', () => {
         db.getCustomerSync = jest.fn().mockReturnValue({ email: 'a' })
         mail.send = jest.fn()
 
-        // lib.notifyCustomer calls getCustomerSync() and mail.send() in that order that why we had to create mock fxns for them to begin with
         lib.notifyCustomer({ customerId: 1 })
 
         expect(mail.send).toHaveBeenCalled()
-        // checking that the mock fxn was called with certain arguments
         expect(mail.send.mock.calls[0][0]).toBe('a')
         expect(mail.send.mock.calls[0][1]).toMatch(/order/)
     })
